@@ -150,7 +150,18 @@ function checkValue(who)
                 case 'Jack': value+=10; break;
                 case 'Queen': value+=10; break;
                 case 'King': value+=10; break;
-                case 'Ace': value+=1; break;
+                case 'Ace':
+                {
+                    if(value <= 10)
+                    {
+                        value+=11;
+                    }
+                    else
+                    {
+                        ++value;
+                    }
+                    break;
+                }
                 default: value+=parseInt(playerHand[i].rank, 10);
             }
         }
@@ -164,7 +175,18 @@ function checkValue(who)
                 case 'Jack': value+=10; break;
                 case 'Queen': value+=10; break;
                 case 'King': value+=10; break;
-                case 'Ace': value+=1; break;
+                case 'Ace':
+                {
+                    if(value <= 10)
+                    {
+                        value+=11;
+                    }
+                    else
+                    {
+                        ++value;
+                    }
+                    break;
+                }
                 default: value+=parseInt(dealerHand[i].rank, 10);
             }
         }
@@ -270,3 +292,4 @@ function buttonFunction()
         ai();
     });
 }
+
