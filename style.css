@@ -9,6 +9,35 @@ html
     grid-template-columns: auto;
     grid-template-rows: repeat(2, auto);
 }
+.nav
+{
+    display: block;
+}
+ul
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: orange;
+}
+li
+{
+    display: inline;
+    float: left;
+}
+li a
+{
+    display: block;
+    text-decoration: none;
+    text-align: center;
+    padding: 8px;
+    color: Maroon;
+}
+li a:hover
+{
+    background-color: aqua;
+}
 #hand
 {
     display: flex;
