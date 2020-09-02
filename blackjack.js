@@ -1,26 +1,90 @@
 //Create the variables we're going to need
+
+class Player
+{
+    constructor(name, myTurn)
+    {
+        this.name = name;
+        this.myTurn = myTurn;
+        this.hand = [];
+        name = document.createElement('a');
+        name.innerHTML = this.name + '\'s hand &nbsp;';
+        document.body.appendChild(name);
+        this.handElement = document.createElement('div');
+        this.handElement.id = this.name + '\'s-hand';
+        this.handElement.style.display = 'flex';
+        this.handElement.style.padding = '5px';
+        this.handElement.style.justifyContent = 'center';
+        this.handElement.style.alignContent = 'space-around';
+        this.handElement.style.flexWrap = 'wrap';
+        document.body.appendChild(this.handElement);
+        this.staying = false;
+        this.busted = false;
+    }
+    addCard(card)
+    {
+        this.hand.push(card);
+        this.addImage();
+        this.bust();
+    }
+    addImage()
+    {
+        if(this.name !== players[0].name)
+        {
+            let redCard = document.createElement('img');
+            redCard.src = 'card-images/red_back.png';
+            redCard.height = 200;
+            redCard.width = 200;
+            this.handElement.appendChild(redCard);
+            return;
+        }
+        this.handElement.appendChild(this.hand[this.hand.length-1].img);
+    }
+    checkValue()
+    {
+        let value = 0;
+        for(let i = 0; i < this.hand.length; ++i)
+        {
+            switch(this.hand[i].rank)
+            {
+                case 'Jack': value+=10; break;
+                case 'Queen': value+=10; break;
+                case 'King': value+=10; break;
+                case 'Ace':
+                {
+                    if(value <= 10)
+                    {
+                        value+=11;
+                    }
+                    else
+                    {
+                        ++value;
+                    }
+                    break;
+                }
+                default: value+=parseInt(this.hand[i].rank, 10);
+            }
+        }
+        return value;
+    }
+    bust()
+    {
+        if(this.checkValue() > 21)
+        {
+            this.busted = true;
+            this.staying = true;
+            compareScores();
+        }
+    }
+}
 players = [];
 deck = [];
-playerHand = [];
-dealerHand = [];
-whoseTurn = 'player';
-playerStay = false;
-cpuStay = false;
-playerBust = false;
-cpuBust = false;
-playerTurn = true;
-playerIndex = 0;
-cpuIndex = 0;
-hand = document.getElementById('hand');
-dHand = document.getElementById('dealer-hand');
-hitElement = document.getElementById('Hit');
-stayElement = document.getElementById('Stay');
 startGame();
 //does the game setup
 function startGame()
 {
-    makePlayers();
     makeDeck();
+    makePlayers();
     deal();
     buttonFunction();
 }
@@ -28,24 +92,8 @@ function startGame()
 
 function makePlayers()
 {
-    let hand = document.createElement('img');
-    hand.id = 'hand1';
-    let hand2 = document.createElement('img');
-    hand2.id = 'hand2';
-    players[0] = makePlayer('player', true, [], 0, false, false, hand);
-    players[1] = makePlayer('computer', false, [], 0, false, false, hand2);
-}
-//create a player object
-function makePlayer(name, myTurn, hand, handSize, stay, bust, element)
-{
-    return {
-        name: name,
-        myTurn: myTurn,
-        hand: hand,
-        handSize: handSize,
-        stay: false,
-        element: element
-    };
+    players[0] = new Player('Player', true);
+    players[1] = new Player('Computer', false);
 }
 //Creates the deck then shuffles it
 function makeDeck()
@@ -56,7 +104,7 @@ function makeDeck()
     {
         for(let j = 0; j < ranks.length; j++)
         {
-            let card =
+            const card =
                 {
                     rank : ranks[j],
                     suit : suits[i],
@@ -109,187 +157,110 @@ function deal()
 }
 function draw(who)
 {
-    if(who === "player")
+    for(let i = 0; i < players.length; ++i)
     {
-        playerHand[playerIndex] = deck.pop();
-        addImage(who);
-    }
-    else
-    {
-        dealerHand[cpuIndex] = deck.pop();
-        addImage(who);
-    }
-    bust();
-}
-function addImage(who)
-{
-    if(who === 'player')
-    {
-        hand.appendChild(playerHand[playerIndex].img);
-        ++playerIndex;
-    }
-    else
-    {
-        let redCard = document.createElement('img');
-        redCard.height = 200;
-        redCard.width = 200;
-        redCard.src = 'card-images/red_back.png';
-        dHand.appendChild(redCard);
-        ++cpuIndex;
-    }
-}
-function checkValue(who)
-{
-    let value = 0;
-    if(who === 'player')
-    {
-        for(let i = 0; i < playerIndex; ++i)
+        if(players[i].name === who)
         {
-            switch(playerHand[i].rank)
-            {
-                case 'Jack': value+=10; break;
-                case 'Queen': value+=10; break;
-                case 'King': value+=10; break;
-                case 'Ace':
-                {
-                    if(value <= 10)
-                    {
-                        value+=11;
-                    }
-                    else
-                    {
-                        ++value;
-                    }
-                    break;
-                }
-                default: value+=parseInt(playerHand[i].rank, 10);
-            }
+            players[i].addCard(deck.pop());
         }
-    }
-    else
-    {
-        for(let i = 0; i < cpuIndex; ++i)
-        {
-            switch(dealerHand[i].rank)
-            {
-                case 'Jack': value+=10; break;
-                case 'Queen': value+=10; break;
-                case 'King': value+=10; break;
-                case 'Ace':
-                {
-                    if(value <= 10)
-                    {
-                        value+=11;
-                    }
-                    else
-                    {
-                        ++value;
-                    }
-                    break;
-                }
-                default: value+=parseInt(dealerHand[i].rank, 10);
-            }
-        }
-    }
-    return value;
-}
-function bust()
-{
-    if(checkValue('player') > 21)
-    {
-        playerStay = true;
-        cpuStay = true;
-        playerBust = true;
-        compareScores();
-    }
-    else if(checkValue('cpu') > 21)
-    {
-        cpuBust = true;
-        playerStay = true;
-        cpuStay = true;
-        compareScores();
     }
 }
 function compareScores()
 {
-    if(playerBust)
+    if(players[0].busted)
     {
-        ending('cpu');
+        ending(players[1].name);
     }
-    else if(cpuBust)
+    else if(players[1].busted)
     {
-        ending('player');
-    }
-    else if(checkValue('player') >= checkValue('cpu'))
-    {
-        ending('player');
+        ending(players[0].name);
     }
     else
     {
-        ending('cpu');
+        let winner = players[0];
+        for(let i = 0; i < players.length; ++i)
+        {
+            if(players[i].checkValue() > winner.checkValue())
+            {
+                winner = players[i];
+            }
+        }
+        ending(winner.name);
     }
 }
 function ending(winner)
 {
     let ending = document.getElementById('ending');
-    if(winner === 'player')
-    {
-        ending.innerText = 'The Player Wins';
-    }
-    else
-    {
-        ending.innerText = 'The Computer Wins';
-    }
-    displayCpuHand()
+    ending.innerText = winner + " wins";
+    displayCpuHand();
 }
 function displayCpuHand()
 {
-    for(let i = 0; i < cpuIndex; ++i)
+    for(let i = 0; i < players[1].hand.length; ++i)
     {
-        dHand.replaceChild(dealerHand[i].img, dHand.childNodes[i]);
+        players[1].handElement.replaceChild(players[1].hand[i].img, players[1].handElement.childNodes[i]);
     }
 }
 function ai()
 {
-    while(checkValue('computer') <= 14)
+    while(players[1].checkValue() < 17)
     {
-        draw();
-        if(!playerStay)
+        draw(players[1].name);
+        if(players[0].staying === false)
         {
-            playerTurn = true;
+            players[0].myTurn = true;
             return;
         }
     }
-    if(checkValue('computer') > 14)
+    if(players[1].checkValue() >= 17)
     {
-        cpuStay = true;
-        if(playerStay)
+        players[1].staying = true;
+        if(players[0].staying)
         {
             compareScores();
         }
         else
         {
-            playerTurn = true;
-
+            players[0].myTurn = true;
         }
     }
 }
 function buttonFunction()
 {
+    let buttons = document.createElement('div');
+    buttons.className = 'buttons';
+    let hitElement = document.createElement('button');
+    hitElement.className = 'buttons';
+    hitElement.innerText = 'hit';
+    hitElement.style.height = '50px';
+    hitElement.style.width = '50px';
+    hitElement.style.padding = '10px';
+    let stayElement = document.createElement('button');
+    stayElement.innerText = 'stay';
+    stayElement.style.height = '50px';
+    stayElement.style.width = '50px';
+    stayElement.style.padding = '10px';
+    /*let againElement = document.createElement('button');
+    againElement.innerText = 'play again?';*/
+    buttons.append(hitElement, stayElement);
+    document.body.appendChild(buttons);
     hitElement.addEventListener('click', () =>
     {
-        if(!playerStay && playerTurn)
+        if(!players[0].staying && players[0].myTurn)
         {
-            draw('player');
-            playerTurn = false;
+            draw(players[0].name);
+            players[0].myTurn = false;
             ai();
         }
     });
     stayElement.addEventListener('click', () =>
     {
-        playerStay = true;
-        playerTurn = false;
+        players[0].staying = true;
+        players[0].myTurn = false;
         ai();
     });
+    /*againElement.addEventListener('click', () =>
+    {
+        startGame();
+    });*/
 }
-
