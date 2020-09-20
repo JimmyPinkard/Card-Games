@@ -11,12 +11,13 @@ class Player
         name.innerHTML = this.name + '\'s hand &nbsp;';
         document.body.appendChild(name);
         this.handElement = document.createElement('div');
-        this.handElement.id = this.name + '\'s-hand';
+        this.handElement.id = "hand"
+        /*this.handElement.id = this.name + '\'s-hand';
         this.handElement.style.display = 'flex';
         this.handElement.style.padding = '5px';
         this.handElement.style.justifyContent = 'center';
         this.handElement.style.alignContent = 'space-around';
-        this.handElement.style.flexWrap = 'wrap';
+        this.handElement.style.flexWrap = 'wrap';*/
         document.body.appendChild(this.handElement);
         this.staying = false;
         this.busted = false;
@@ -240,9 +241,12 @@ function buttonFunction()
     stayElement.style.height = '50px';
     stayElement.style.width = '50px';
     stayElement.style.padding = '10px';
-    /*let againElement = document.createElement('button');
-    againElement.innerText = 'play again?';*/
-    buttons.append(hitElement, stayElement);
+    let againElement = document.createElement('button');
+    againElement.innerText = 'again';
+    againElement.style.height = '50px';
+    againElement.style.width = '50px';
+    againElement.style.padding = '10px';
+    buttons.append(hitElement, stayElement, againElement);
     document.body.appendChild(buttons);
     hitElement.addEventListener('click', () =>
     {
@@ -259,8 +263,9 @@ function buttonFunction()
         players[0].myTurn = false;
         ai();
     });
-    /*againElement.addEventListener('click', () =>
+    againElement.addEventListener('click', () =>
     {
+        location.reload();
         startGame();
-    });*/
+    });
 }
